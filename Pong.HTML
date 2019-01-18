@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+		h1{
+
+			text-align: center;
+			font-family: Arial, Helvetica, sans-serif;
+			text-transform: uppercase;
+			color:white;
+		}
+
+		body{
+			background-color: black;
+
+		}
+		
+		</style>
+	</head>
+<body>
+
+
+<center>
+<h1>PONG</h1>
+<canvas id = "myCanvas" width = "650" height="500"> </canvas>
+</center>
+
+
+
+<script>
+
+	var canvas;
+	var ctx;
+	var posX = 320;
+	var posY = 212.5;
+	var ballSpeedX = 3;
+	var ballSpeedY = 4;
+
+	var paddleOne = 212.5;
+	var paddleTwo = 212.5
+	var paddleHeight = 75;
+	var paddleThickness = 15;
+
+	var player1Score = 0;
+	var player2Score = 0;
+
+
+	window.onload = function (){
+
+		var canvas = document.getElementById("myCanvas");
+		var ctx = canvas.getContext("2d");
+		
+
+		var framesPerSec = 60;
+		setInterval(function() {
+			move();
+			drawStuff();
+		},1000/framesPerSec);
+		
+		// event for moving mouse up/down
+		canvas.addEventListener('mousemove',function(evt){
+		
+		// gets mouse vertical position
+		paddleOne = evt.clientY - (paddleHeight/0.5);
+			
+	});
+		
+		
+	// creates everything you see on canvas
+	function drawStuff(){
+		
+		console.log(posX);
+		//canvas background
+		colorRect(0,0,650,500,"black");
+		
+		//player paddle
+		colorRect(0,paddleOne ,paddleThickness,paddleHeight,"white");
+		
+		//computer paddle
+		colorRect(635,paddleTwo,paddleThickness,paddleHeight,"white");
+
+		//circle
+		colorCircle(posX,posY,5,"white");
+		
+		//line in the middle
+		ctx.beginPath();
+		ctx.strokeStyle = "white";
+		ctx.moveTo(325,0);
+		ctx.lineTo(325,500);
+		ctx.stroke();
+		
+		//score
+		ctx.font="20px Arial";
+		ctx.fillStyle = "white";
+		ctx.fillText(player1Score,75,75);
+		ctx.fillText(player2Score,575,75);
+
+	}
+
+	//function for ball
+	function colorCircle(x,y,r,color){
+
+		ctx.fillStyle = color;
+		ctx.beginPath();
+		ctx.arc(x,y,r,0,2*Math.PI,true);
+		ctx.fill();
+
+	}
+
+	//function for Paddles
+	function colorRect(leftX,topY,width,height,color){
+
+		ctx.fillStyle = color;
+		ctx.fillRect(leftX,topY,width,height);
+
+	}	
+	
+		
+	//computer AI
+	function computerMovement(){
+
+		var paddleTwoCenter = paddleTwo + (paddleHeight/2);
+			if(paddleTwoCenter < posY-25){
+				paddleTwo = paddleTwo += 5;
+		} else if(paddleTwoCenter > posY+25){
+			paddleTwo = paddleTwo -= 5;
+			}
+	}
+	
+	//resets ball to middle
+	function reset(){
+		if(player1Score >= 6 || player2Score >= 6 ){
+			player1Score = 0;
+			player2Score = 0;
+		}
+		ballSpeedX = -3;
+		ballSpeedY = 0;
+		posX = canvas.width/2;
+		posY = canvas.height/2;
+	}
+
+	//ball movement
+	function move()	{
+		computerMovement();
+
+		posX = posX + ballSpeedX;
+		posY = posY + ballSpeedY;
+		
+		//if ball passes paddle1
+		if(posX < 0){
+			if(posY > paddleOne && posY < paddleOne + paddleHeight){
+			
+				ballSpeedX = -ballSpeedX +0.50 ;
+				var newY = posY - (paddleOne + paddleHeight/2)
+				ballSpeedY = newY * 0.1;
+				
+			}else{
+			
+			player2Score ++;
+			reset();
+		
+			}
+		}
+		//if ball passes paddle2
+		if(posX > canvas.width){
+		
+			if(posY > paddleTwo && posY < paddleTwo + paddleHeight){
+			
+				ballSpeedX = -ballSpeedX ;
+				var newY = posY - (paddleTwo + paddleHeight/2)
+				ballSpeedY = newY * 0.21;
+				
+			}else{
+			
+			player1Score ++;
+			reset();
+
+			}
+		}
+		
+		if(posY < 0){
+		
+			ballSpeedY = -ballSpeedY;
+		}
+			if(posY > canvas.height){
+		
+			ballSpeedY = -ballSpeedY;
+		}
+	}
+}
+
+</script>
+</body>
+</html>
+
